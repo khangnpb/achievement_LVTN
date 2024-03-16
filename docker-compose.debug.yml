@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  odoo:
+    # Chage Odoo version image:
+    #   image: novobidevops/odoo:[odoo_version]
+    # Available [odoo_version]: 10, 11, 12, 13, 14, 15
+
+    image: hr:15
+    # build: ./box
+
+    # If developer want to use their own Docker environment, Do the following actions : 
+    #
+    # + comment line #9 
+    # + uncomment line #10. 
+    # + Make adjustment on file ./box/Dockerfile
+    #
+    # After docker-compose up, a new docker image will be built 
+    # with the new adjustments on the file ./box/Dockerfile
+
+    ports:
+      - "8069:8069"
+      - "8888:8888"
+    volumes:
+      - ./:/opt/odoo
+      - odoo_data:/root/.local/share/Odoo
+    command: bash -c "$${PYTHON_PATH} $${DEBUG_ODOO} $${START_ODOO} $${ODOO_PARAM} && tail -f /dev/null"
+    environment:
+      PYTHON_PATH: "/usr/local/bin/python3"
+      DEBUG_ODOO: "-m debugpy --listen 0.0.0.0:8888"
+      START_ODOO: "/opt/odoo/odoo/odoo-bin -c /opt/odoo/odoo.conf"
+      ODOO_PARAM: ""
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    tty: true
+  # nginx:
+  #   image: nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./box/odoo_nginx.conf:/etc/nginx/conf.d/default.conf
+  #   restart: unless-stopped
+  #   tty: true
+  postgres:
+    image: postgres:10
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    tty: true
+
+volumes:
+  odoo_data:
+  postgres_data:
