@@ -4,7 +4,7 @@
 #      novobidevops/odoo:13
 #      novobidevops/odoo:12
 
-FROM novobidevops/odoo:15
+FROM novobidevops/odoo:16
 
 # Example 1: Install new python libs in the new image
 # RUN pip3 install --no-cache-dir paramiko
@@ -18,6 +18,7 @@ RUN pip3 install oauth2client
 RUN pip3 install SkPy
 RUN pip3 install pytz
 RUN pip3 install html2text
+RUN pip3 install PyPDF2
 # Skype SDK
 
 

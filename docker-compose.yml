@@ -6,7 +6,7 @@ services:
     #   image: novobidevops/odoo:[odoo_version]
     # Available [odoo_version]: 10, 11, 12, 13, 14, 15
 
-    image: odoo-crm:18
+    image: crm-odoo:16
     # build: ./box
 
     # If developer want to use their own Docker environment, Do the following actions : 
@@ -22,10 +22,10 @@ services:
       - "8069:8069"
     volumes:
       - ./:/opt/odoo
-      - odoo_data:/root/.local/share/Odoo
+      - odoo_data:/home/odoo/.local/share/Odoo
     command: bash -c "$${PYTHON_PATH} $${START_ODOO} $${ODOO_PARAM} && tail -f /dev/null"
     environment:
-      PYTHON_PATH: "/usr/local/bin/python3"
+      PYTHON_PATH: "/usr/bin/python3"
       START_ODOO: "/opt/odoo/odoo/odoo-bin -c /opt/odoo/odoo.conf"
       ODOO_PARAM: "" 
       #"--no-database-list"
@@ -46,15 +46,6 @@ services:
       - ./certbot/conf:/etc/letsencrypt
     restart: unless-stopped
     tty: true
-
-  # certbot:
-  #   image: certbot/certbot
-  #   volumes:
-  #     - ./certbot/www:/var/www/certbot
-  #     - ./certbot/conf:/etc/letsencrypt
-  #   depends_on:
-  #     - nginx
-  #   command: certonly --webroot --webroot-path=/var/www/certbot --email dugkiet@email.com --agree-tos --no-eff-email -d crm.tuankiet.media -d n8n.tuankiet.media
   postgres:
     image: postgres:14-bullseye
     ports:
@@ -67,32 +58,7 @@ services:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoo
     tty: true
-  n8n:
-    image: n8nio/n8n
-    ports:
-      - "5678:5678"
-    environment:
-      - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgres
-      - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=postgres
-      - DB_POSTGRESDB_USER=odoo
-      - DB_POSTGRESDB_PASSWORD=odoo
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=admin123
-      - N8N_HOST=n8n.local
-      - N8N_PORT=5678
-      - N8N_SECURE_COOKIE=false
-    depends_on:
-      - postgres
-    restart: unless-stopped
-    volumes:
-      - n8n_data:/home/node/.n8n
-    tty: true
-
-
+ 
 volumes:
   odoo_data:
   postgres_data:
-  n8n_data:
